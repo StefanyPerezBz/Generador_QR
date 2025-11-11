@@ -57,7 +57,9 @@ if st.sidebar.button("Cerrar sesión"):
     st.session_state.logged_in = False
     st.rerun()
 
-BASE_URL = "http://localhost:8502/view_media"  # Cambia si usas otro puerto o dominio
+# BASE_URL = "http://localhost:8502/view_media"  
+
+BASE_URL = os.getenv("BASE_URL_VIEW_MEDIA")
 
 # --- SUBIR DOCUMENTO ---
 if choice == "📤 Subir documento":
