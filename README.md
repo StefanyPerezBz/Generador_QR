@@ -165,25 +165,6 @@ Luego abre en tu navegador:
 
 ---
 
-## 💡 Ideas futuras  
-
-- 📦 Integrar **Supabase Storage** para almacenamiento persistente en la nube.  
-- 🌍 Añadir soporte multiusuario (roles: admin, editor, visitante).  
-- 📤 Exportar QR en PDF con información del documento.  
-- 🔔 Agregar notificaciones por correo o Telegram.
-
----
-
-## 👩‍💻 Autores  
-
-1. **José Andrés Farro Lagos** — Universidad Nacional de Trujillo  
-2. **Stefany Marisel Pérez Bazán** — Universidad Nacional de Trujillo  
-
-📧 Contacto: joseandres.farro@unitru.edu.pe  
-🌐 GitHub: [https://github.com/tuusuario](https://github.com/tuusuario)
-
----
-
 ## 📜 Licencia  
 
 Este proyecto está licenciado bajo **MIT License**.  
