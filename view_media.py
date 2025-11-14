@@ -15,7 +15,8 @@ st.set_page_config(page_title="Ver documento", page_icon="🎧", layout="centere
 # ==============================================
 # 🎨 ESTILOS PERSONALIZADOS
 # ==============================================
-st.markdown("""
+st.markdown(
+    """
 <style>
     .block-container {
         max-width: 800px;
@@ -48,11 +49,14 @@ st.markdown("""
         margin-top: 2rem;
     }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # ==============================================
 # 🧩 FUNCIONES PRINCIPALES
 # ==============================================
+
 
 def obtener_documento(doc_id: str):
     """Obtiene un documento desde Supabase por su ID."""
@@ -123,14 +127,15 @@ def reiniciar_pantalla():
 
     st.rerun()
 
+
 # ==============================================
 # 🧭 FLUJO PRINCIPAL
 # ==============================================
 st.title("📄 Visualizador de Documento por QR")
 
-# Leer parámetros de la URL
-query_params = st.experimental_get_query_params()
-doc_id = query_params.get("doc_id", [None])[0]
+# Leer parámetros de la URL (API NUEVA)
+query_params = st.query_params
+doc_id = query_params.get("doc_id", None)
 
 if doc_id:
     doc = obtener_documento(doc_id)
@@ -141,12 +146,16 @@ if doc_id:
             reiniciar_pantalla()
     else:
         st.warning("⚠️ QR inválido o documento no encontrado.")
-        uploaded_qr = st.file_uploader("📷 Suba la imagen del código QR", type=["png", "jpg", "jpeg"])
+        uploaded_qr = st.file_uploader(
+            "📷 Suba la imagen del código QR", type=["png", "jpg", "jpeg"]
+        )
         if uploaded_qr:
             procesar_imagen_qr(uploaded_qr)
 else:
     st.info("📷 Suba una imagen del código QR para visualizar su documento asociado.")
-    uploaded_qr = st.file_uploader("Suba la imagen del código QR", type=["png", "jpg", "jpeg"])
+    uploaded_qr = st.file_uploader(
+        "Suba la imagen del código QR", type=["png", "jpg", "jpeg"]
+    )
     if uploaded_qr:
         procesar_imagen_qr(uploaded_qr)
 
