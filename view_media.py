@@ -4,8 +4,10 @@ from PIL import Image
 import io
 import urllib.parse as urlparse
 import requests
-import cv2
 import numpy as np
+
+# Lazy load de OpenCV (arregla pantalla blanca en móviles)
+cv2 = None
 
 # ==============================================
 # ⚙️ CONFIGURACIÓN INICIAL
@@ -13,15 +15,14 @@ import numpy as np
 st.set_page_config(page_title="Ver documento", page_icon="🎧", layout="centered")
 
 # ==============================================
-# 🎨 ESTILOS PERSONALIZADOS
+# 🎨 ESTILOS PERSONALIZADOS (compatible móviles)
 # ==============================================
-st.markdown(
-    """
+st.markdown("""
 <style>
     .block-container {
-        max-width: 800px;
-        margin: auto;
-        padding-top: 1rem;
+        margin: auto !important;
+        padding-top: 1rem !important;
+        width: 100% !important;
     }
 
     .stButton>button {
@@ -32,7 +33,9 @@ st.markdown(
         border-radius: 8px;
         padding: 0.5rem 1.2rem;
         transition: 0.3s;
+        width: 100%;
     }
+
     .stButton>button:hover {
         background-color: #218838;
         transform: scale(1.03);
@@ -40,6 +43,7 @@ st.markdown(
 
     h1, h2, h3 {
         text-align: center;
+        width: 100%;
     }
 
     .footer {
@@ -49,14 +53,12 @@ st.markdown(
         margin-top: 2rem;
     }
 </style>
-""",
-    unsafe_allow_html=True,
-)
+""", unsafe_allow_html=True)
+
 
 # ==============================================
 # 🧩 FUNCIONES PRINCIPALES
 # ==============================================
-
 
 def obtener_documento(doc_id: str):
     """Obtiene un documento desde Supabase por su ID."""
@@ -75,25 +77,29 @@ def mostrar_documento(doc):
 
     try:
         if doc["media_type"] == "image":
-            st.image(doc["media_url"], caption="📷 Imagen cargada")
+            st.image(doc["media_url"], caption="📷 Imagen cargada", use_container_width=True)
         elif doc["media_type"] == "video":
             st.video(doc["media_url"])
         elif doc["media_type"] == "audio":
             st.audio(doc["media_url"])
         else:
             st.warning("⚠️ Tipo de archivo no soportado.")
-    except Exception as e:
-        st.error(f"⚠️ No se pudo abrir el archivo multimedia: {e}")
+    except Exception:
+        st.error("⚠️ Archivo multimedia no disponible o dañado.")
 
 
 def procesar_imagen_qr(uploaded_qr):
-    """Lee una imagen de QR usando OpenCV."""
+    """Lee una imagen de QR usando OpenCV (lazy load)."""
+    global cv2
+    if cv2 is None:
+        import cv2  # carga solo cuando es necesario
+
     try:
         file_bytes = np.asarray(bytearray(uploaded_qr.read()), dtype=np.uint8)
         image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
         detector = cv2.QRCodeDetector()
-        qr_data, points, _ = detector.detectAndDecode(image)
+        qr_data, _, _ = detector.detectAndDecode(image)
 
         if not qr_data:
             st.error("⚠️ No se pudo detectar ningún código QR.")
@@ -102,6 +108,7 @@ def procesar_imagen_qr(uploaded_qr):
         # Extraer doc_id del enlace
         parsed = urlparse.urlparse(qr_data)
         params = urlparse.parse_qs(parsed.query)
+
         doc_id = params.get("doc_id", [None])[0]
 
         if not doc_id:
@@ -113,7 +120,7 @@ def procesar_imagen_qr(uploaded_qr):
         if not doc:
             st.error("❌ Documento no encontrado.")
         else:
-            st.success("✅ Código QR leído correctamente.")
+            st.success("✅ QR leído correctamente.")
             mostrar_documento(doc)
 
     except Exception as e:
@@ -124,7 +131,6 @@ def reiniciar_pantalla():
     """Reinicia completamente la app."""
     for key in list(st.session_state.keys()):
         del st.session_state[key]
-
     st.rerun()
 
 
@@ -133,10 +139,18 @@ def reiniciar_pantalla():
 # ==============================================
 st.title("📄 Visualizador de Documento por QR")
 
-# Leer parámetros de la URL (API NUEVA)
-query_params = st.query_params
-doc_id = query_params.get("doc_id", None)
+# Leer parámetros de la URL (manejo seguro)
+raw_id = st.query_params.get("doc_id", None)
 
+if isinstance(raw_id, list):
+    doc_id = raw_id[0]
+else:
+    doc_id = raw_id
+
+if doc_id == "":
+    doc_id = None
+
+# Si hay doc_id en la URL
 if doc_id:
     doc = obtener_documento(doc_id)
     if doc:
@@ -146,16 +160,14 @@ if doc_id:
             reiniciar_pantalla()
     else:
         st.warning("⚠️ QR inválido o documento no encontrado.")
-        uploaded_qr = st.file_uploader(
-            "📷 Suba la imagen del código QR", type=["png", "jpg", "jpeg"]
-        )
+        uploaded_qr = st.file_uploader("📷 Suba la imagen del código QR", type=["png", "jpg", "jpeg"])
         if uploaded_qr:
             procesar_imagen_qr(uploaded_qr)
+
+# Si no hay doc_id → subir QR
 else:
     st.info("📷 Suba una imagen del código QR para visualizar su documento asociado.")
-    uploaded_qr = st.file_uploader(
-        "Suba la imagen del código QR", type=["png", "jpg", "jpeg"]
-    )
+    uploaded_qr = st.file_uploader("Suba la imagen del código QR", type=["png", "jpg", "jpeg"])
     if uploaded_qr:
         procesar_imagen_qr(uploaded_qr)
 
