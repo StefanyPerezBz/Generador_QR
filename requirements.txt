@@ -4,4 +4,5 @@ python-dotenv
 supabase
 qrcode
 Pillow
-pyzbar
+requests
+numpy

@@ -1,10 +1,11 @@
 import streamlit as st
 from services.supabase_client import supabase
 from PIL import Image
-from pyzbar.pyzbar import decode
 import io
 import urllib.parse as urlparse
 import requests
+import cv2
+import numpy as np
 
 # ==============================================
 # ⚙️ CONFIGURACIÓN INICIAL
@@ -82,25 +83,29 @@ def mostrar_documento(doc):
 
 
 def procesar_imagen_qr(uploaded_qr):
-    """Lee una imagen de QR y muestra el documento asociado."""
+    """Lee una imagen de QR usando OpenCV."""
     try:
-        image = Image.open(io.BytesIO(uploaded_qr.read()))
-        decoded_objects = decode(image)
+        file_bytes = np.asarray(bytearray(uploaded_qr.read()), dtype=np.uint8)
+        image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
-        if not decoded_objects:
-            st.error("⚠️ No se detectó ningún código QR en la imagen.")
+        detector = cv2.QRCodeDetector()
+        qr_data, points, _ = detector.detectAndDecode(image)
+
+        if not qr_data:
+            st.error("⚠️ No se pudo detectar ningún código QR.")
             return
 
-        qr_data = decoded_objects[0].data.decode("utf-8")
+        # Extraer doc_id del enlace
         parsed = urlparse.urlparse(qr_data)
         params = urlparse.parse_qs(parsed.query)
         doc_id = params.get("doc_id", [None])[0]
 
         if not doc_id:
-            st.error("⚠️ El código QR no contiene un ID válido.")
+            st.error("⚠️ El QR no contiene un ID válido.")
             return
 
         doc = obtener_documento(doc_id)
+
         if not doc:
             st.error("❌ Documento no encontrado.")
         else:
@@ -108,14 +113,14 @@ def procesar_imagen_qr(uploaded_qr):
             mostrar_documento(doc)
 
     except Exception as e:
-        st.error(f"❌ Ocurrió un error al procesar el QR: {e}")
+        st.error(f"❌ Error al procesar el QR: {e}")
 
 
 def reiniciar_pantalla():
     """Reinicia completamente la app."""
     for key in list(st.session_state.keys()):
         del st.session_state[key]
-    st.query_params.clear()
+
     st.rerun()
 
 # ==============================================
@@ -123,8 +128,9 @@ def reiniciar_pantalla():
 # ==============================================
 st.title("📄 Visualizador de Documento por QR")
 
-query_params = st.query_params
-doc_id = query_params.get("doc_id", None)
+# Leer parámetros de la URL
+query_params = st.experimental_get_query_params()
+doc_id = query_params.get("doc_id", [None])[0]
 
 if doc_id:
     doc = obtener_documento(doc_id)
