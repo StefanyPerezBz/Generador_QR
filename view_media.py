@@ -155,9 +155,6 @@ if doc_id:
     doc = obtener_documento(doc_id)
     if doc:
         mostrar_documento(doc)
-        st.markdown("---")
-        if st.button("Escanear otro QR"):
-            reiniciar_pantalla()
     else:
         st.warning("⚠️ QR inválido o documento no encontrado.")
         uploaded_qr = st.file_uploader("📷 Suba la imagen del código QR", type=["png", "jpg", "jpeg"])
