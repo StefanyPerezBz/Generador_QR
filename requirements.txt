@@ -1,7 +1,7 @@
 streamlit
+opencv-python-headless
 python-dotenv
 supabase
 qrcode
 Pillow
 pyzbar
-opencv-python-headless
