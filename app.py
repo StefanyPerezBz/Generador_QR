@@ -9,13 +9,13 @@ from dotenv import load_dotenv
 import requests
 
 # ==============================================
-# ⚙️ CONFIGURACIÓN INICIAL
+# CONFIGURACIÓN INICIAL
 # ==============================================
 load_dotenv()
 st.set_page_config(page_title="Gestor de Códigos QR", page_icon="🎥", layout="wide")
 
 # ==============================================
-# 🎨 ESTILOS PERSONALIZADOS
+# ESTILOS PERSONALIZADOS
 # ==============================================
 st.markdown(
     """
@@ -65,7 +65,7 @@ BUCKET_QRS = "qr_codes"
 BASE_URL = os.getenv("BASE_URL_VIEW_MEDIA")
 
 # ==============================================
-# 🔐 SESIÓN DE ADMINISTRADOR
+# SESIÓN DE ADMINISTRADOR
 # ==============================================
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -98,7 +98,7 @@ if not st.session_state.logged_in:
     st.stop()
 
 # ==============================================
-# 🏠 DASHBOARD
+# DASHBOARD
 # ==============================================
 st.title("📂 Administrador de Documentos Multimedia")
 st.sidebar.markdown("### ⚙️ Menú principal")
@@ -112,7 +112,7 @@ if st.sidebar.button("Cerrar sesión"):
     st.rerun()
 
 # ==============================================
-# 📤 SUBIR DOCUMENTO
+# SUBIR DOCUMENTO
 # ==============================================
 if choice == "Subir documento":
     st.subheader("📤 Subir nuevo documento multimedia")
@@ -235,7 +235,7 @@ if choice == "Subir documento":
                 )
 
 # ==============================================
-# 📋 VER / EDITAR DOCUMENTOS
+# VER / EDITAR DOCUMENTOS
 # ==============================================
 elif choice == "Ver / Editar documentos":
     st.subheader("📑 Documentos multimedia registrados")
