@@ -10,12 +10,12 @@ import numpy as np
 cv2 = None
 
 # ==============================================
-# ⚙️ CONFIGURACIÓN INICIAL
+# CONFIGURACIÓN INICIAL
 # ==============================================
 st.set_page_config(page_title="Ver documento", page_icon="🎧", layout="centered")
 
 # ==============================================
-# 🎨 ESTILOS PERSONALIZADOS (compatible móviles)
+# ESTILOS PERSONALIZADOS (compatible móviles)
 # ==============================================
 st.markdown("""
 <style>
@@ -57,7 +57,7 @@ st.markdown("""
 
 
 # ==============================================
-# 🧩 FUNCIONES PRINCIPALES
+# FUNCIONES PRINCIPALES
 # ==============================================
 
 def obtener_documento(doc_id: str):
@@ -135,7 +135,7 @@ def reiniciar_pantalla():
 
 
 # ==============================================
-# 🧭 FLUJO PRINCIPAL
+# FLUJO PRINCIPAL
 # ==============================================
 st.title("📄 Visualizador de Documento por QR")
 
@@ -169,7 +169,7 @@ else:
         procesar_imagen_qr(uploaded_qr)
 
 # ==============================================
-# ✨ FOOTER
+# FOOTER
 # ==============================================
 st.markdown("---")
 st.markdown(
